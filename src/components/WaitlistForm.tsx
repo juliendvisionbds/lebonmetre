@@ -183,7 +183,6 @@ export default function WaitlistForm() {
             <button className="cta dark" onClick={handleProfileSubmit} disabled={submitting}>
               {submitting ? "…" : "Valider mon inscription"}
             </button>
-            <p className="microcopy">Vous pouvez répondre plus tard, votre place est déjà tenue.</p>
           </div>
         )}
 
