@@ -26,13 +26,16 @@ function isEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value.trim());
 }
 
+const INVALID_EMAIL_MESSAGE = "Entrez une adresse email valide pour continuer.";
+const SERVER_ERROR_MESSAGE = "Une erreur est survenue, réessayez dans quelques instants.";
+
 type Step = "email" | "profile" | "done";
 
 export default function WaitlistForm() {
   const { stats, setStats } = useStats();
   const [step, setStep] = useState<Step>("email");
   const [email, setEmail] = useState("");
-  const [error, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [metier, setMetier] = useState(METIERS[0]);
   const [volume, setVolume] = useState(VOLUMES[0]);
@@ -41,10 +44,10 @@ export default function WaitlistForm() {
 
   async function handleEmailSubmit() {
     if (!isEmail(email)) {
-      setError(true);
+      setErrorMessage(INVALID_EMAIL_MESSAGE);
       return;
     }
-    setError(false);
+    setErrorMessage(null);
     setSubmitting(true);
     try {
       const res = await fetch("/api/waitlist", {
@@ -58,10 +61,10 @@ export default function WaitlistForm() {
         if (data.stats) setStats(data.stats);
         setStep("profile");
       } else {
-        setError(true);
+        setErrorMessage(SERVER_ERROR_MESSAGE);
       }
     } catch {
-      setError(true);
+      setErrorMessage(SERVER_ERROR_MESSAGE);
     } finally {
       setSubmitting(false);
     }
@@ -120,9 +123,7 @@ export default function WaitlistForm() {
             <button className="cta" onClick={handleEmailSubmit} disabled={submitting}>
               {submitting ? "…" : "Réserver ma place"}
             </button>
-            <p className={`err${error ? " show" : ""}`}>
-              Entrez une adresse email valide pour continuer.
-            </p>
+            <p className={`err${errorMessage ? " show" : ""}`}>{errorMessage}</p>
 
             <div className="scale">
               <div className="scale-head">

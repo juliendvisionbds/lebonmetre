@@ -6,7 +6,8 @@ TypeScript) et une vraie API route pour gérer l'inscription à l'alpha.
 ## Stack
 
 - **Next.js 16** (App Router, Turbopack) + **TypeScript**
-- **better-sqlite3** pour la persistance de la liste d'attente (fichier local, aucun service externe requis)
+- **Supabase (Postgres)** pour la persistance de la liste d'attente (fonctionne en serverless sur Vercel)
+- **Resend** pour les emails transactionnels (confirmation inscrit + notifications internes)
 - Polices **Sora / Inter / IBM Plex Mono** via `next/font/google`
 - CSS "vanilla" (pas de framework) — reprend fidèlement le design fourni (identité "jeu de plans")
 
@@ -19,8 +20,44 @@ npm run dev
 
 Ouvrez [http://localhost:3000](http://localhost:3000).
 
-La base SQLite est créée automatiquement dans `data/waitlist.db` au premier lancement
-(ce fichier est ignoré par git).
+### Configuration requise (`.env.local`)
+
+Copiez `.env.local.example` vers `.env.local` et renseignez :
+
+```bash
+RESEND_API_KEY=            # https://resend.com/api-keys
+SUPABASE_URL=               # Project Settings > API
+SUPABASE_SERVICE_ROLE_KEY=  # Project Settings > API (clé privée, jamais exposée au client)
+```
+
+### Créer la table Supabase
+
+Dans l'éditeur SQL de votre projet Supabase (Dashboard > SQL Editor), exécutez :
+
+```sql
+create table if not exists waitlist_entries (
+  id bigint generated always as identity primary key,
+  email text not null unique,
+  source text,
+  metier text,
+  volume text,
+  plans text,
+  profile_completed_at timestamptz,
+  created_at timestamptz not null default now()
+);
+```
+
+La clé `service_role` utilisée côté serveur contourne le Row Level Security (RLS) : pas besoin
+d'activer de policy pour que l'API fonctionne, mais gardez cette clé strictement privée
+(jamais de préfixe `NEXT_PUBLIC_`, jamais commit).
+
+## Déploiement (Vercel)
+
+Sur Vercel, ajoutez les mêmes variables d'environnement (`Project > Settings > Environment
+Variables`) : `RESEND_API_KEY`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`.
+
+> Le système de fichiers des fonctions serverless de Vercel est en lecture seule : toute
+> persistance doit passer par un service externe (ici Supabase), jamais par un fichier local.
 
 ## Architecture
 
@@ -38,8 +75,9 @@ src/
     Footer.tsx               # Affiche le statut dynamique de l'alpha
     Header.tsx, Hero.tsx, ProblemSection.tsx, ... # Sections statiques du contenu
   lib/
-    db.ts        # Connexion SQLite (singleton, survit au hot-reload)
+    db.ts        # Client Supabase (singleton, clé service_role)
     waitlist.ts  # Logique métier : validation email, calcul de rang, stats de places
+    email.ts     # Emails transactionnels via Resend
 ```
 
 ## API
@@ -62,6 +100,10 @@ Retourne l'état courant de la liste d'attente :
 
 Réponse : `{ "ok": true, "rank": 14, "stats": { ... } }`
 
+Déclenche l'envoi de deux emails (best-effort, n'échoue jamais la requête) :
+- confirmation à l'inscrit (récap + rang)
+- notification interne à `juliend@visionbds.com`
+
 **Étape 2 — profil (optionnelle, complète l'inscription) :**
 
 ```json
@@ -74,11 +116,11 @@ Réponse : `{ "ok": true, "rank": 14, "stats": { ... } }`
 }
 ```
 
+Déclenche une notification interne enrichie (métier, volume, format de plans).
+
 ## Notes
 
 - Le compteur de places (« 13/30 ») part d'une base de 13 places déjà réservées (reprise de
   la maquette d'origine) à laquelle s'ajoutent les vraies inscriptions stockées en base.
 - Chaque inscription email est unique (contrainte SQL) : une même adresse renvoie toujours le
   même rang si elle est soumise plusieurs fois.
-- Pour la prod, il suffit de remplacer `better-sqlite3` par la base de votre choix (Postgres,
-  Supabase, etc.) dans `src/lib/db.ts` et `src/lib/waitlist.ts` — le reste de l'app n'a pas à changer.

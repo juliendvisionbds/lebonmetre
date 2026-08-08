@@ -1,4 +1,6 @@
-import { getDb } from "./db";
+import { getSupabase } from "./db";
+
+const TABLE = "waitlist_entries";
 
 /** Nombre total de places de l'alpha. */
 export const ALPHA_CAPACITY = 30;
@@ -18,16 +20,7 @@ export type WaitlistStats = {
   full: boolean;
 };
 
-export function isValidEmail(value: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value.trim());
-}
-
-export function getStats(): WaitlistStats {
-  const db = getDb();
-  const { count } = db
-    .prepare("SELECT COUNT(*) as count FROM waitlist_entries")
-    .get() as { count: number };
-
+function statsFromCount(count: number): WaitlistStats {
   const total = BASELINE_RESERVED + count;
   const remaining = Math.max(ALPHA_CAPACITY - total, 0);
   const percent = Math.min(Math.round((total / ALPHA_CAPACITY) * 100), 100);
@@ -41,28 +34,68 @@ export function getStats(): WaitlistStats {
   };
 }
 
+export function isValidEmail(value: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value.trim());
+}
+
+export async function getStats(): Promise<WaitlistStats> {
+  const supabase = getSupabase();
+  const { count, error } = await supabase
+    .from(TABLE)
+    .select("*", { count: "exact", head: true });
+
+  if (error) {
+    throw error;
+  }
+
+  return statsFromCount(count ?? 0);
+}
+
+/**
+ * Variante best-effort pour le rendu serveur de la page : ne doit jamais
+ * faire planter l'affichage si Supabase est momentanément inaccessible.
+ */
+export async function getStatsOrDefault(): Promise<WaitlistStats> {
+  try {
+    return await getStats();
+  } catch (err) {
+    console.error("Impossible de récupérer les stats de la waitlist :", err);
+    return statsFromCount(0);
+  }
+}
+
 export type RegisterResult = {
   rank: number;
   alreadyRegistered: boolean;
 };
 
-export function registerEmail(email: string, source: string): RegisterResult {
-  const db = getDb();
+export async function registerEmail(email: string, source: string): Promise<RegisterResult> {
+  const supabase = getSupabase();
   const normalized = email.trim().toLowerCase();
 
-  const existing = db
-    .prepare("SELECT id FROM waitlist_entries WHERE email = ?")
-    .get(normalized) as { id: number } | undefined;
+  const { data: inserted, error: insertError } = await supabase
+    .from(TABLE)
+    .insert({ email: normalized, source })
+    .select("id")
+    .single();
 
-  if (existing) {
-    return { rank: BASELINE_RESERVED + existing.id, alreadyRegistered: true };
+  if (!insertError && inserted) {
+    return { rank: BASELINE_RESERVED + inserted.id, alreadyRegistered: false };
   }
 
-  const info = db
-    .prepare("INSERT INTO waitlist_entries (email, source) VALUES (?, ?)")
-    .run(normalized, source);
+  // Email déjà inscrit (contrainte unique en base) : on retrouve son rang existant
+  // plutôt que de faire échouer la requête.
+  const { data: existing, error: selectError } = await supabase
+    .from(TABLE)
+    .select("id")
+    .eq("email", normalized)
+    .single();
 
-  return { rank: BASELINE_RESERVED + Number(info.lastInsertRowid), alreadyRegistered: false };
+  if (selectError || !existing) {
+    throw insertError ?? selectError ?? new Error("Impossible d'enregistrer l'inscription.");
+  }
+
+  return { rank: BASELINE_RESERVED + existing.id, alreadyRegistered: true };
 }
 
 export type ProfileInput = {
@@ -76,25 +109,28 @@ export type CompleteProfileResult = {
   rank: number | null;
 };
 
-export function completeProfile(email: string, profile: ProfileInput): CompleteProfileResult {
-  const db = getDb();
+export async function completeProfile(
+  email: string,
+  profile: ProfileInput
+): Promise<CompleteProfileResult> {
+  const supabase = getSupabase();
   const normalized = email.trim().toLowerCase();
 
-  const info = db
-    .prepare(
-      `UPDATE waitlist_entries
-       SET metier = ?, volume = ?, plans = ?, profile_completed_at = datetime('now')
-       WHERE email = ?`
-    )
-    .run(profile.metier, profile.volume, profile.plans, normalized);
+  const { data, error } = await supabase
+    .from(TABLE)
+    .update({
+      metier: profile.metier,
+      volume: profile.volume,
+      plans: profile.plans,
+      profile_completed_at: new Date().toISOString(),
+    })
+    .eq("email", normalized)
+    .select("id")
+    .maybeSingle();
 
-  if (info.changes === 0) {
+  if (error || !data) {
     return { updated: false, rank: null };
   }
 
-  const row = db
-    .prepare("SELECT id FROM waitlist_entries WHERE email = ?")
-    .get(normalized) as { id: number } | undefined;
-
-  return { updated: true, rank: row ? BASELINE_RESERVED + row.id : null };
+  return { updated: true, rank: BASELINE_RESERVED + data.id };
 }

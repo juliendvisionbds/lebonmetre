@@ -7,19 +7,22 @@ function isEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value.trim());
 }
 
+const INVALID_EMAIL_MESSAGE = "Entrez une adresse email valide pour continuer.";
+const SERVER_ERROR_MESSAGE = "Une erreur est survenue, réessayez dans quelques instants.";
+
 export default function FinalCta() {
   const { stats, setStats } = useStats();
   const [email, setEmail] = useState("");
-  const [error, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [done, setDone] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   async function handleSubmit() {
     if (!isEmail(email)) {
-      setError(true);
+      setErrorMessage(INVALID_EMAIL_MESSAGE);
       return;
     }
-    setError(false);
+    setErrorMessage(null);
     setSubmitting(true);
     try {
       const res = await fetch("/api/waitlist", {
@@ -32,10 +35,10 @@ export default function FinalCta() {
         if (data.stats) setStats(data.stats);
         setDone(true);
       } else {
-        setError(true);
+        setErrorMessage(SERVER_ERROR_MESSAGE);
       }
     } catch {
-      setError(true);
+      setErrorMessage(SERVER_ERROR_MESSAGE);
     } finally {
       setSubmitting(false);
     }
@@ -75,9 +78,7 @@ export default function FinalCta() {
                   {submitting ? "…" : "Réserver ma place"}
                 </button>
               </div>
-              <p className={`err${error ? " show" : ""}`}>
-                Entrez une adresse email valide pour continuer.
-              </p>
+              <p className={`err${errorMessage ? " show" : ""}`}>{errorMessage}</p>
               <p style={{ fontSize: 13, color: "var(--sub)", marginTop: 14 }}>
                 Un email à l&apos;ouverture, un autre si le produit change vraiment. Rien
                 d&apos;autre. Désinscription en un clic.

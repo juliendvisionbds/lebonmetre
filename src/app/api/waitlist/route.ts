@@ -7,7 +7,7 @@ import {
   registerEmail,
 } from "@/lib/waitlist";
 
-// La DB SQLite est lue/écrite à chaque appel : jamais de cache statique.
+// Les stats viennent de Supabase à chaque appel : jamais de cache statique.
 export const dynamic = "force-dynamic";
 
 type WaitlistBody = {
@@ -20,7 +20,13 @@ type WaitlistBody = {
 };
 
 export async function GET() {
-  return NextResponse.json(getStats());
+  try {
+    const stats = await getStats();
+    return NextResponse.json(stats);
+  } catch (err) {
+    console.error("GET /api/waitlist a échoué :", err);
+    return NextResponse.json({ error: "stats_unavailable" }, { status: 500 });
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -36,37 +42,43 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, error: "invalid_email" }, { status: 400 });
   }
 
-  if (body.step === "profile") {
-    const metier = body.metier ?? "";
-    const volume = body.volume ?? "";
-    const plans = body.plans ?? "";
-    const { updated, rank } = completeProfile(email, { metier, volume, plans });
+  try {
+    if (body.step === "profile") {
+      const metier = body.metier ?? "";
+      const volume = body.volume ?? "";
+      const plans = body.plans ?? "";
+      const { updated, rank } = await completeProfile(email, { metier, volume, plans });
 
-    if (updated && rank !== null) {
-      // Best-effort : un échec d'envoi ne doit jamais faire échouer l'inscription déjà enregistrée.
-      // On attend l'envoi (Vercel peut couper la fonction dès la réponse renvoyée sinon).
+      if (updated && rank !== null) {
+        // Best-effort : un échec d'envoi ne doit jamais faire échouer l'inscription déjà enregistrée.
+        try {
+          await notifyAdminProfileCompleted({ email, rank, metier, volume, plans });
+        } catch (err) {
+          console.error("Échec de l'envoi de la notification 'profil complété' :", err);
+        }
+      }
+
+      const stats = await getStats();
+      return NextResponse.json({ ok: true, stats });
+    }
+
+    const { rank, alreadyRegistered } = await registerEmail(email, body.source ?? "unknown");
+
+    if (!alreadyRegistered) {
       try {
-        await notifyAdminProfileCompleted({ email, rank, metier, volume, plans });
+        await Promise.all([
+          sendWaitlistConfirmationEmail({ email, rank }),
+          notifyAdminNewSignup({ email, rank, source: body.source ?? "unknown" }),
+        ]);
       } catch (err) {
-        console.error("Échec de l'envoi de la notification 'profil complété' :", err);
+        console.error("Échec de l'envoi des emails d'inscription à l'alpha :", err);
       }
     }
 
-    return NextResponse.json({ ok: true, stats: getStats() });
+    const stats = await getStats();
+    return NextResponse.json({ ok: true, rank, stats });
+  } catch (err) {
+    console.error("POST /api/waitlist a échoué :", err);
+    return NextResponse.json({ ok: false, error: "server_error" }, { status: 500 });
   }
-
-  const { rank, alreadyRegistered } = registerEmail(email, body.source ?? "unknown");
-
-  if (!alreadyRegistered) {
-    try {
-      await Promise.all([
-        sendWaitlistConfirmationEmail({ email, rank }),
-        notifyAdminNewSignup({ email, rank, source: body.source ?? "unknown" }),
-      ]);
-    } catch (err) {
-      console.error("Échec de l'envoi des emails d'inscription à l'alpha :", err);
-    }
-  }
-
-  return NextResponse.json({ ok: true, rank, stats: getStats() });
 }

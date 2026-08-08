@@ -12,10 +12,13 @@ import ScopeSection from "@/components/ScopeSection";
 import SolutionSection from "@/components/SolutionSection";
 import { StatsProvider } from "@/components/StatsContext";
 import TimelineSection from "@/components/TimelineSection";
-import { getStats } from "@/lib/waitlist";
+import { getStatsOrDefault } from "@/lib/waitlist";
 
-export default function Home() {
-  const stats = getStats();
+// Les places restantes changent à chaque inscription : jamais de page statique en cache.
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const stats = await getStatsOrDefault();
 
   return (
     <StatsProvider initialStats={stats}>
