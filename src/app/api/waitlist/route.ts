@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { notifyAdminNewSignup, notifyAdminProfileCompleted, sendWaitlistConfirmationEmail } from "@/lib/email";
 import {
   completeProfile,
   getStats,
@@ -36,14 +37,36 @@ export async function POST(request: NextRequest) {
   }
 
   if (body.step === "profile") {
-    completeProfile(email, {
-      metier: body.metier ?? "",
-      volume: body.volume ?? "",
-      plans: body.plans ?? "",
-    });
+    const metier = body.metier ?? "";
+    const volume = body.volume ?? "";
+    const plans = body.plans ?? "";
+    const { updated, rank } = completeProfile(email, { metier, volume, plans });
+
+    if (updated && rank !== null) {
+      // Best-effort : un échec d'envoi ne doit jamais faire échouer l'inscription déjà enregistrée.
+      // On attend l'envoi (Vercel peut couper la fonction dès la réponse renvoyée sinon).
+      try {
+        await notifyAdminProfileCompleted({ email, rank, metier, volume, plans });
+      } catch (err) {
+        console.error("Échec de l'envoi de la notification 'profil complété' :", err);
+      }
+    }
+
     return NextResponse.json({ ok: true, stats: getStats() });
   }
 
-  const { rank } = registerEmail(email, body.source ?? "unknown");
+  const { rank, alreadyRegistered } = registerEmail(email, body.source ?? "unknown");
+
+  if (!alreadyRegistered) {
+    try {
+      await Promise.all([
+        sendWaitlistConfirmationEmail({ email, rank }),
+        notifyAdminNewSignup({ email, rank, source: body.source ?? "unknown" }),
+      ]);
+    } catch (err) {
+      console.error("Échec de l'envoi des emails d'inscription à l'alpha :", err);
+    }
+  }
+
   return NextResponse.json({ ok: true, rank, stats: getStats() });
 }

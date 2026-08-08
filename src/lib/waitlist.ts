@@ -71,7 +71,12 @@ export type ProfileInput = {
   plans: string;
 };
 
-export function completeProfile(email: string, profile: ProfileInput): boolean {
+export type CompleteProfileResult = {
+  updated: boolean;
+  rank: number | null;
+};
+
+export function completeProfile(email: string, profile: ProfileInput): CompleteProfileResult {
   const db = getDb();
   const normalized = email.trim().toLowerCase();
 
@@ -83,5 +88,13 @@ export function completeProfile(email: string, profile: ProfileInput): boolean {
     )
     .run(profile.metier, profile.volume, profile.plans, normalized);
 
-  return info.changes > 0;
+  if (info.changes === 0) {
+    return { updated: false, rank: null };
+  }
+
+  const row = db
+    .prepare("SELECT id FROM waitlist_entries WHERE email = ?")
+    .get(normalized) as { id: number } | undefined;
+
+  return { updated: true, rank: row ? BASELINE_RESERVED + row.id : null };
 }
