@@ -46,6 +46,13 @@ export default function Footer() {
           </div>
         </dl>
       </div>
+
+      <p className="foot-credit">
+        Fait avec 🧡 en France. Propulsé par{" "}
+        <a href="https://visionbds.com" target="_blank" rel="noopener noreferrer">
+          Visionbds.com
+        </a>
+      </p>
     </footer>
   );
 }
