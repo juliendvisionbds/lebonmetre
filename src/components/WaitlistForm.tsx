@@ -99,7 +99,7 @@ export default function WaitlistForm() {
         {step === "email" && (
           <div id="step1">
             <h3>Réservez votre place</h3>
-            <p className="hint">Accès gratuit pendant toute l&apos;alpha. Aucune carte bancaire.</p>
+            <p className="hint">Accès gratuit pendant toute l&apos;alpha.</p>
 
             <div className="field">
               <label htmlFor="email">Votre email professionnel</label>
@@ -123,7 +123,6 @@ export default function WaitlistForm() {
             <p className={`err${error ? " show" : ""}`}>
               Entrez une adresse email valide pour continuer.
             </p>
-            <p className="microcopy">Une seule question de plus après, puis c&apos;est fait.</p>
 
             <div className="scale">
               <div className="scale-head">
@@ -183,7 +182,7 @@ export default function WaitlistForm() {
             <button className="cta dark" onClick={handleProfileSubmit} disabled={submitting}>
               {submitting ? "…" : "Valider mon inscription"}
             </button>
-            <p className="microcopy">Vous pouvez répondre plus tard — votre place est déjà tenue.</p>
+            <p className="microcopy">Vous pouvez répondre plus tard, votre place est déjà tenue.</p>
           </div>
         )}
 
@@ -196,11 +195,11 @@ export default function WaitlistForm() {
               et le lien direct vers l&apos;outil. Rien d&apos;autre entre-temps.
             </p>
             <div className="rank">
-              Position : <b>#{rank ?? "—"}</b> · vague 01
+              Position : <b>#{rank ?? "…"}</b> · vague 01
             </div>
             <p style={{ marginTop: 16 }}>
-              Une question d&apos;ici là ? Répondez simplement à l&apos;email de confirmation —
-              c&apos;est moi qui lis.
+              Une question d&apos;ici là ? Répondez simplement à l&apos;email de confirmation,
+              c&apos;est nous qui lisons.
             </p>
           </div>
         )}

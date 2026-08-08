@@ -14,7 +14,6 @@ export default function Header() {
       <div className="wrap nav">
         <a href="#" className="logo">
           <span className="logo-mark"></span>Le&nbsp;Bon&nbsp;Métré
-          <span className="logo-tld">.com</span>
         </a>
         <nav className="nav-links">
           <a href="#probleme">Le problème</a>
@@ -23,7 +22,6 @@ export default function Header() {
           <a href="#faq">Questions</a>
         </nav>
         <div className="nav-right">
-          <span className="pill">Alpha · 30 places</span>
           <button className="nav-cta" onClick={goForm}>
             Réserver ma place
           </button>

@@ -13,9 +13,6 @@ export default function Footer() {
             <div className="logo" style={{ fontSize: 15 }}>
               <span className="logo-mark" style={{ width: 22, height: 22 }}></span>
               Le&nbsp;Bon&nbsp;Métré
-              <span className="logo-tld" style={{ fontSize: 12 }}>
-                .com
-              </span>
             </div>
             <p className="foot-note">
               Métré assisté par IA pour le gros œuvre et le terrassement. Vérification humaine
@@ -26,8 +23,6 @@ export default function Footer() {
           <div className="foot-links">
             <a href="#form">Rejoindre l&apos;alpha</a>
             <a href="#faq">Questions</a>
-            <a href="#">Mentions légales</a>
-            <a href="#">Confidentialité</a>
           </div>
         </div>
         <dl className="foot-meta">

@@ -7,19 +7,19 @@ const FAQS: { q: string; a: string[] }[] = [
     q: "C'est fiable à combien de pourcents ?",
     a: [
       "La bonne question, et la réponse honnête est : ça dépend de votre plan, et l'outil vous le dit. Une cote clairement inscrite est lue avec une fiabilité très élevée. Une dimension déduite de l'échelle l'est moins. Une donnée absente du plan devient une hypothèse explicitement signalée. C'est précisément pour ça que chaque ligne porte un badge : vous ne relisez pas tout, vous relisez ce qui est marqué.",
-      "Le Bon Métré est un outil de métré assisté avec vérification humaine. Ce n'est pas un oracle, et je ne le vendrai jamais comme tel.",
+      "Le Bon Métré est un outil de métré assisté avec vérification humaine. Ce n'est pas un oracle, et nous ne le vendrons jamais comme tel.",
     ],
   },
   {
     q: "Que devient mon plan une fois uploadé ?",
     a: [
-      "Il est traité pour produire votre métré, puis conservé sur votre compte le temps que vous en ayez besoin. Vous pouvez le supprimer à tout moment. Aucun plan n'est partagé, revendu, ni utilisé pour entraîner un modèle public. Si votre dossier est sous accord de confidentialité, dites-le à l'inscription : je peux signer un NDA avant votre premier upload.",
+      "Il est traité pour produire votre métré, puis conservé sur votre compte le temps que vous en ayez besoin. Vous pouvez le supprimer à tout moment. Aucun plan n'est partagé, revendu, ni utilisé pour entraîner un modèle public. Si votre dossier est sous accord de confidentialité, dites-le à l'inscription : nous pouvons signer un NDA avant votre premier upload.",
     ],
   },
   {
     q: "Quel type de plan faut-il ?",
     a: [
-      "Un plan côté, avec une échelle. Idéalement un PDF d'exécution, mais un scan propre ou une photo bien cadrée fonctionne. Plus votre plan est renseigné — coupes, niveaux, épaisseurs — moins l'outil aura besoin de faire des hypothèses.",
+      "Un plan côté, avec une échelle. Idéalement un PDF d'exécution, mais un scan propre ou une photo bien cadrée fonctionne. Plus votre plan est renseigné (coupes, niveaux, épaisseurs), moins l'outil aura besoin de faire des hypothèses.",
       "Si un plan est illisible, l'outil vous le dit au lieu de deviner.",
     ],
   },
@@ -32,7 +32,7 @@ const FAQS: { q: string; a: string[] }[] = [
   {
     q: "Ça coûte quoi pendant l'alpha ?",
     a: [
-      "Rien. Pas de carte, pas d'essai de 14 jours, pas de conversion automatique en abonnement. Vous entrez, vous utilisez, vous me dites ce qui cloche. Le seul engagement attendu est un retour honnête sur vos premiers métrés.",
+      "Rien. Pas de carte, pas d'essai de 14 jours, pas de conversion automatique en abonnement. Vous entrez, vous utilisez, vous nous dites ce qui cloche. Le seul engagement attendu est un retour honnête sur vos premiers métrés.",
     ],
   },
   {
@@ -42,7 +42,7 @@ const FAQS: { q: string; a: string[] }[] = [
     ],
   },
   {
-    q: "Je fais du second œuvre, ça m'intéresse quand même — je m'inscris ?",
+    q: "Je fais du second œuvre, ça m'intéresse quand même, je m'inscris ?",
     a: [
       "Inscrivez-vous, mais sachez que vous n'entrerez pas dans la première vague. L'alpha est concentrée sur le gros œuvre et le terrassement, parce qu'un outil de métré médiocre sur dix lots est moins utile qu'un outil précis sur quatre. Vous serez prévenu quand le second œuvre ouvrira.",
     ],
@@ -50,7 +50,8 @@ const FAQS: { q: string; a: string[] }[] = [
   {
     q: "Qui est derrière Le Bon Métré ?",
     a: [
-      "Un builder solo, en France, qui développe le produit avec des professionnels du gros œuvre plutôt qu'à leur place. Pas de levée de fonds, pas de service commercial. L'email que vous recevrez vient de moi, et vous pouvez y répondre.",
+      "Une petite équipe de trois, en France, issue de l'agence visionbds.com. Nous travaillons avec des entreprises du BTP depuis plusieurs années, avec une expérience passée dans des grands groupes (ASO, Whirlpool, le PIF en Arabie Saoudite) et dans des startups à succès comme Molotov TV.",
+      "Pas de levée de fonds, pas de service commercial : le produit se construit avec les professionnels du gros œuvre, pas à leur place. L'email que vous recevrez vient de nous, et vous pouvez y répondre.",
     ],
   },
 ];
@@ -72,7 +73,7 @@ export default function FaqSection() {
         <span className="c-ind">Ind. A</span>
       </div>
 
-      <h2 className="kicker">Ce qu&apos;on me demande le plus.</h2>
+      <h2 className="kicker">Ce qu&apos;on nous demande le plus.</h2>
 
       <div className="faq">
         {FAQS.map((item, i) => (

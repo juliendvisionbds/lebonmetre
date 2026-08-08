@@ -10,7 +10,7 @@ const DONE = [
 
 const LATER = [
   "Second œuvre (cloisons, plâtrerie, revêtements)",
-  "Lecture native DWG / IFC — passez par un export PDF",
+  "Lecture native DWG / IFC (passez par un export PDF)",
   "Prix unitaires et sortie DPGF chiffrée",
   "Recoupement automatique de plusieurs plans d'un même projet",
   "Export direct vers Batigest, Onaya, EBP",
@@ -28,7 +28,7 @@ export default function ScopeSection() {
       </div>
 
       <h2 className="kicker">
-        Ce que l&apos;alpha fait déjà — et ce qu&apos;elle ne fait pas encore.
+        Ce que l&apos;alpha fait déjà, et ce qu&apos;elle ne fait pas encore.
       </h2>
       <p className="lede">Autant vous le dire maintenant plutôt qu&apos;après votre inscription.</p>
 

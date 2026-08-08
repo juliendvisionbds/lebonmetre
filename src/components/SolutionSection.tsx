@@ -12,7 +12,7 @@ const STEPS = [
   {
     n: "Étape 03",
     title: "Vérifiez et exportez",
-    text: "Vous corrigez une quantité en un clic, vous cochez les postes contrôlés, vous exportez la feuille de minute en CSV — prête pour votre chiffrage.",
+    text: "Vous corrigez une quantité en un clic, vous cochez les postes contrôlés, vous exportez la feuille de minute en CSV, prête pour votre chiffrage.",
   },
 ];
 
@@ -60,7 +60,7 @@ export default function SolutionSection() {
       <h2 className="kicker">Un métré assisté, vérifiable ligne par ligne.</h2>
       <p className="lede">
         Le Bon Métré ne prétend pas remplacer votre œil. Il fait le travail de relevé et de
-        calcul, puis vous montre <strong>exactement</strong> ce sur quoi il s&apos;est appuyé —
+        calcul, puis vous montre <strong>exactement</strong> ce sur quoi il s&apos;est appuyé,
         pour que vous contrôliez en minutes ce qui vous prenait des heures.
       </p>
 
@@ -82,7 +82,7 @@ export default function SolutionSection() {
 
         <div className="sheet">
           <div className="sheet-top">
-            <span>Feuille de minute — Lot 02 · Fondations</span>
+            <span>Feuille de minute : Lot 02 · Fondations</span>
             <span>Plan_EXE_02.pdf</span>
           </div>
           <table>

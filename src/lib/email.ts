@@ -68,7 +68,7 @@ export async function sendWaitlistConfirmationEmail(params: {
         sur vos premiers plans.
       </p>
       <p style="font-size:13px; line-height:1.6; color:#6E7278; margin:0;">
-        Une question d'ici là ? Répondez simplement à cet email — c'est moi qui lis.
+        Une question d'ici là ? Répondez simplement à cet email, c'est nous qui lisons.
       </p>
     `
   );

@@ -21,7 +21,7 @@ const plexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Le Bon Métré — L'alpha ouvre · Le métré gros œuvre depuis vos plans",
+  title: "Le Bon Métré : l'alpha ouvre · Le métré gros œuvre depuis vos plans",
   description:
     "Le Bon Métré lit vos plans d'exécution et sort une feuille de minute vérifiable en 4 minutes. L'alpha privée ouvre pour 30 entreprises de gros œuvre et terrassement.",
 };

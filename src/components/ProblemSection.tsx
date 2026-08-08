@@ -2,7 +2,7 @@ const PROBLEMS = [
   {
     n: "01",
     title: "Vous relevez à la main",
-    text: "Échelle, cotes, report sur la feuille de minute. Une ligne oubliée et tout le poste est faux — sans que rien ne le signale.",
+    text: "Échelle, cotes, report sur la feuille de minute. Une ligne oubliée et tout le poste est faux, sans que rien ne le signale.",
   },
   {
     n: "02",
@@ -12,7 +12,7 @@ const PROBLEMS = [
   {
     n: "03",
     title: "Les plans sont incomplets",
-    text: "Pas de profondeur hors gel, coupe manquante, épaisseur de dallage nulle part. Vous supposez — et vous oubliez ce que vous avez supposé.",
+    text: "Pas de profondeur hors gel, coupe manquante, épaisseur de dallage nulle part. Vous supposez, et vous oubliez ce que vous avez supposé.",
   },
   {
     n: "04",
@@ -35,8 +35,8 @@ export default function ProblemSection() {
         Ce qui vous prend du temps, ce n&apos;est pas le chiffrage. C&apos;est le métré.
       </h2>
       <p className="lede">
-        Sur un DCE de maison individuelle, sortir les quantités propres — déblais, semelles,
-        voiles, dallage — c&apos;est trois à cinq heures. Avant même d&apos;avoir posé un prix.
+        Sur un DCE de maison individuelle, sortir les quantités propres (déblais, semelles,
+        voiles, dallage), c&apos;est trois à cinq heures. Avant même d&apos;avoir posé un prix.
         Et personne ne vous paie pour ces heures-là.
       </p>
 

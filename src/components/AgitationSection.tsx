@@ -17,7 +17,7 @@ const ITEMS = [
   {
     num: "7 / 10",
     title: "Les DCE que vous ne chiffrez pas",
-    text: "Sur dix dossiers reçus, vous en traitez trois. Pas par manque d'envie — par manque d'heures. Ceux que vous laissez passer, vous ne les compterez jamais dans vos pertes.",
+    text: "Sur dix dossiers reçus, vous en traitez trois. Pas par manque d'envie, par manque d'heures. Ceux que vous laissez passer, vous ne les compterez jamais dans vos pertes.",
   },
 ];
 

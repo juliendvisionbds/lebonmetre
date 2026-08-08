@@ -18,7 +18,7 @@ export default function FitSection() {
   return (
     <section className="wrap" style={{ paddingTop: 20 }}>
       <h2 className="kicker" style={{ marginTop: 0 }}>
-        Pour qui c&apos;est fait — et pour qui ça ne l&apos;est pas.
+        Pour qui c&apos;est fait, et pour qui ça ne l&apos;est pas.
       </h2>
 
       <div className="fit">
